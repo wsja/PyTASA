@@ -159,6 +159,10 @@ def load_msat_simple(fh, eunit="GPa", dunit="Kgm3", dnorm=False, symmetry=None):
                     if symmetry is None:
                         c_out[jj-1, ii-1] = cc
                     c_seen[jj-1,ii-1] = True
+                elif (c_seen[ii-1,jj-1] and c_seen[jj-1,ii-1] and
+                      (c_out[ii-1, jj-1] == cc or c_out[jj-1, ii-1] == cc)):
+                    #  Symmetric index already present and equal
+                    pass
                 else:
                     raise PytasaIOError("Double specified value on line {}".format(i+1))
             else:
