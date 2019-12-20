@@ -286,7 +286,11 @@ def groupvels(Cin,rh,incl,azim,slowout=False):
                                              groupvels( Cin,rh,incl,azim,slowout=True )
                 Additionally output P, S1 and S2-wave slownesses (SNP, ...) and 
                 phase velocities (VPP, ...) in vector form, as calculated by phasevels.
-        
+
+        where:
+        VGP: P wave velocity
+        VGS1: fast S wave velocity
+        VGS2: slow S wave velocity
         
         Notes:
             Based on original fortran code by Mike Kendall and Sean Guest as part of ATRAK.
