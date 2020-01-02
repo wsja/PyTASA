@@ -6,6 +6,8 @@ import numpy as num
 Compute long wavelength equivalent anisotropic elastic medium
 """
 
+eps = abs(7./3 - 4./3 - 1)
+
 def backus_monoclin(f=[], c=[]):
     """
     Compute long wavelength anisotorpic medium from anisotropic layers
@@ -23,17 +25,17 @@ def backus_monoclin(f=[], c=[]):
         msg = 'c, f, and m must have the same size and have at least one element'
         raise IndexError(msg)
 
-    f = num.asarray(f)
-    if num.sum(f) != 1:
-        df = 1 - num.sum(f)
-        f += df/len(f)
+    f = num.array(f)
+    if abs(num.sum(f) - 1) > eps:
+        msg = 'Elements of f must sum up to 1'
+        raise ValueError(msg)
 
     av = lambda x: num.sum(f*x)  # average
-    get = lambda i, j: num.asarray([cc[i-1, j-1] for cc in c])
+    get = lambda i, j: num.array([cc[i-1, j-1] for cc in c])
 
     c11 = get(1, 1)
     c22 = get(2, 2)
-    c33 = get(3, 2)
+    c33 = get(3, 3)
     c44 = get(4, 4)
     c55 = get(5, 5)
     c66 = get(6, 6)
@@ -63,18 +65,30 @@ def backus_monoclin(f=[], c=[]):
              av(c55/A)*av(B4)**2)
 
     ce = num.zeros((6, 6))
+    ce[0, 0] = av(c11) - av(c13*B1 + c15*B2) + B5
+    ce[1, 1] = av(c22) - av(c23*B3 + c25*B4) + B7
     ce[2, 2] = AA*av(c33/A)
     ce[3, 3] = av(1/c44)**-1
     ce[4, 4] = AA*av(c55/A)
-    ce[2, 4] = AA*av(c35/A)
-    ce[0, 2] = AA*av(c33/A)*av(B1) + AA*av(c35/A)*av(B2)
-    ce[1, 2] = AA*av(c33/A)*av(B3) + AA*av(c35/A)*av(B4)
-    ce[0, 4] = AA*av(c35/A)*av(B1) + AA*av(c55/A)*av(B2)
-    ce[1, 4] = AA*av(c35/A)*av(B3) + AA*av(c55/A)*av(B4)
-    ce[3, 5] = av(1/c44)**-1 * av(c46/c44)
-    ce[5, 5] = av(c66) - av(c46**2/c44) + av(1/c44)**-1 * av(c46/c44)
-    ce[0, 0] = av(c11) - av(c13*B1 + c15*B2) + B5
-    ce[1, 1] = av(c22) - av(c23*B3 + c25*B4) + B7
+    ce[5, 5] = av(c66) - av(c46**2/c44) + av(1/c44)**-1 * av(c46/c44)**2
+
     ce[0, 1] = av(c12) - av(c13*B3 + c15*B4) + B6
+    ce[0, 2] = AA*av(c33/A)*av(B1) + AA*av(c35/A)*av(B2)
+    ce[0, 4] = AA*av(c35/A)*av(B1) + AA*av(c55/A)*av(B2)
+    ce[1, 0] = ce[0, 1]
+    ce[2, 0] = ce[0, 2]
+    ce[4, 0] = ce[0, 4]
+
+    ce[1, 2] = AA*av(c33/A)*av(B3) + AA*av(c35/A)*av(B4)
+    ce[1, 4] = AA*av(c35/A)*av(B3) + AA*av(c55/A)*av(B4)
+    ce[2, 1] = ce[1, 2]
+    ce[4, 1] = ce[1, 4]
+
+
+    ce[2, 4] = AA*av(c35/A)
+    ce[4, 2] = ce[2, 4]
+
+    ce[3, 5] = av(1/c44)**-1 * av(c46/c44)
+    ce[5, 3] = ce[3, 5]
 
     return ce
