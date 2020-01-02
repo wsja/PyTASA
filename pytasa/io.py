@@ -426,3 +426,15 @@ def txtCij(Cij, filename):
                 f.write("{0:5.1f} ".format(Cij[i,j]))
             f.write("\n")
 
+def printCij(Cij):
+    """
+    Pretty print an elastic tensor
+    """
+
+    out = ""
+    for i in range(6):
+        for j in range(6):
+            out += "{0:5.1f} ".format(Cij[i,j])
+        if i != 5:
+            out += "\n"
+    print(out)
